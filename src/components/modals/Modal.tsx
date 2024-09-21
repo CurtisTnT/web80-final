@@ -9,7 +9,7 @@ import { Dialog, DialogPanel, DialogBackdrop } from "@headlessui/react";
 import { CgClose } from "react-icons/cg";
 import clsx from "clsx";
 
-import ComponentSpinner from "../loading/ComponentSpinner";
+import ComponentSpinner from "@/components/loading/ComponentSpinner";
 
 export type ModalRef = {
   open: () => void;

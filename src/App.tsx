@@ -1,31 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { IoMenuOutline } from "react-icons/io5";
 import { IoSearch } from "react-icons/io5";
-import { FaPlay } from "react-icons/fa";
 
 import "./App.css";
 import ComponentSpinner from "./components/loading/ComponentSpinner";
-import Modal, { ModalRef } from "./components/modals/Modal";
-
-type Film = {
-  ID: string;
-  name: string;
-  time: string;
-  year: number;
-  image: string;
-  introduce: string;
-};
+import { ModalRef } from "./components/modals/Modal";
+import { Film } from "./interface";
+import { initialFilm } from "./initialState";
+import FilmDetailModal from "./components/modals/FilmDetailModal";
 
 const apiUrl = import.meta.env.VITE_API_URL;
-
-const initialFilm: Film = {
-  ID: "",
-  name: "",
-  time: "",
-  year: 0,
-  image: "",
-  introduce: "",
-};
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -101,36 +85,7 @@ function App() {
         </ComponentSpinner>
       </div>
 
-      <Modal ref={detailModalRef} size="lg">
-        <div className="min-h-[530px] mt-5">
-          <div className="absolute -top-20 -left-20">
-            <img
-              src={selectedFilm.image}
-              alt="film-image"
-              className="w-[400px] h-[600px] object-cover rounded-2xl"
-            />
-          </div>
-          <div className="ml-[360px] mr-5 space-y-7">
-            <div>
-              <h1 className="text-4xl">{selectedFilm.name}</h1>
-
-              <div className="text-sm font-medium text-gray-400">
-                {selectedFilm.time} min {selectedFilm.year}
-              </div>
-            </div>
-
-            <p className="font-medium">{selectedFilm.introduce}</p>
-
-            <button
-              type="button"
-              className="flex items-center gap-2.5 px-5 py-2 rounded-3xl bg-gradient-to-r from-[#e67821] to-[#fc882f] text-white text-sm font-semibold hover:opacity-80"
-            >
-              <FaPlay size={12} />
-              PLAY MOVIE
-            </button>
-          </div>
-        </div>
-      </Modal>
+      <FilmDetailModal modalRef={detailModalRef} film={selectedFilm} />
     </main>
   );
 }
