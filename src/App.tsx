@@ -81,6 +81,21 @@ function App() {
                 );
               })}
             </div>
+
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                className="px-4 py-1 rounded-3xl bg-gradient-to-r from-[#e67821] to-[#fc882f] text-white text-sm font-semibold hover:opacity-80"
+              >
+                Prev
+              </button>
+              <button
+                type="button"
+                className="px-4 py-1 rounded-3xl bg-gradient-to-r from-[#e67821] to-[#fc882f] text-white text-sm font-semibold hover:opacity-80"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </ComponentSpinner>
       </div>
