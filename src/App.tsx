@@ -5,15 +5,15 @@ import { IoSearch } from "react-icons/io5";
 import "./App.css";
 import ComponentSpinner from "./components/loading/ComponentSpinner";
 import { ModalRef } from "./components/modals/Modal";
-import { Film } from "./interface";
-import { initialFilm } from "./initialState";
+import { Film, FilmData } from "./interface";
+import { initialFilm, initialFilmData } from "./initialState";
 import FilmDetailModal from "./components/modals/FilmDetailModal";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const [films, setFilms] = useState<Film[]>([]);
+  const [filmData, setFilmData] = useState<FilmData>(initialFilmData);
   const [selectedFilm, setSelectedFilm] = useState<Film>(initialFilm);
 
   const detailModalRef = useRef<ModalRef>(null);
@@ -23,12 +23,43 @@ function App() {
     detailModalRef.current?.open();
   };
 
+  const getFilmList = async (args: {
+    pageNumber: number;
+    pageSize?: number;
+  }) => {
+    const { pageNumber, pageSize = 4 } = args;
+
+    const res: { data: FilmData; isSuccess: boolean } = await fetch(
+      apiUrl + "/films/list" + `?pageNumber=${pageNumber}&pageSize=${pageSize}`
+    ).then((res) => res.json());
+
+    return res;
+  };
+
+  const handleNavigate = async (page: number) => {
+    setLoading(true);
+
+    try {
+      const res = await getFilmList({ pageNumber: page });
+
+      if (res.isSuccess) {
+        setLoading(false);
+        setFilmData(res.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(apiUrl).then((res) => res.json());
-        setLoading(false);
-        setFilms(res.slice(0, 4));
+        const res = await getFilmList({ pageNumber: 1 });
+
+        if (res.isSuccess) {
+          setLoading(false);
+          setFilmData(res.data);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -59,11 +90,11 @@ function App() {
             <h2 className="text-2xl font-medium">Most Popular Movies</h2>
 
             <div className="grid grid-cols-4 gap-7 mt-5 mb-2">
-              {films.map((film) => {
-                const { ID, image, name, time, year } = film;
+              {filmData.items.map((film) => {
+                const { id, image, name, time, year } = film;
                 return (
                   <div
-                    key={ID}
+                    key={id}
                     className="col-span-1 cursor-pointer hover:scale-105 duration-300 rounded-md"
                     onClick={() => handleOpenFilmDetail(film)}
                   >
@@ -85,13 +116,17 @@ function App() {
             <div className="flex items-center justify-between">
               <button
                 type="button"
-                className="px-4 py-1 rounded-3xl bg-gradient-to-r from-[#e67821] to-[#fc882f] text-white text-sm font-semibold hover:opacity-80"
+                className="px-4 py-1 rounded-3xl bg-gradient-to-r from-[#e67821] to-[#fc882f] text-white text-sm font-semibold hover:opacity-80 disabled:opacity-70"
+                disabled={!filmData.hasPrevPage}
+                onClick={() => handleNavigate(filmData.currentPage - 1)}
               >
                 Prev
               </button>
               <button
                 type="button"
-                className="px-4 py-1 rounded-3xl bg-gradient-to-r from-[#e67821] to-[#fc882f] text-white text-sm font-semibold hover:opacity-80"
+                className="px-4 py-1 rounded-3xl bg-gradient-to-r from-[#e67821] to-[#fc882f] text-white text-sm font-semibold hover:opacity-80 disabled:opacity-70"
+                disabled={!filmData.hasNextPage}
+                onClick={() => handleNavigate(filmData.currentPage + 1)}
               >
                 Next
               </button>
